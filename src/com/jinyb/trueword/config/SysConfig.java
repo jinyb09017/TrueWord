@@ -15,5 +15,11 @@ public class SysConfig {
 	public static Integer LOW = 0 ;//µÈ¼¶
 	public static Integer MID = 1 ;
 	public static Integer HIGH = 2 ;
+	
+	
+	public static class Constants{
+		public static final int SETTING = 1;
+		public static final int NOTICE = 2;
+	}
 
 }

@@ -151,7 +151,7 @@ public class BaseActivity extends Activity {
 					dialog.dismiss();
 				}
 			});
-			builder.create().show();
+			dialog =  builder.create();
 			;
 		case SysConfig.Constants.NOTICE:
 			builder = new CustomDialog.Builder(this);
@@ -163,7 +163,7 @@ public class BaseActivity extends Activity {
 					dialog.dismiss();
 				}
 			});
-			builder.create().show();
+			dialog =  builder.create();
 			;
 		}
 		return dialog;

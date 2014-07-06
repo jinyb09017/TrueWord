@@ -5,8 +5,10 @@ import net.youmi.android.AdManager;
 import net.youmi.android.offers.OffersManager;
 import com.jinyb.trueword.R;
 import com.jinyb.trueword.base.BaseActivity;
+import com.jinyb.trueword.config.SysConfig;
 import com.jinyb.trueword.custome.CustomDialog;
 import com.jinyb.trueword.data.DBManager;
+import com.jinyb.trueword.interfaces.IClick;
 import com.jinyb.trueword.listener.ShakeListener;
 import com.jinyb.trueword.listener.ShakeListener.OnShakeListener;
 import com.jinyb.trueword.model.State;
@@ -51,7 +53,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-public class MainActivity extends BaseActivity implements DialogInterface.OnClickListener{
+public class MainActivity extends BaseActivity implements IClick,View.OnClickListener,DialogInterface.OnClickListener{
 	
 	public static String Tag = "MainActivity";
 
@@ -71,6 +73,7 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
 	Boolean dialogFalg = false;
 	public final Integer limitGrade = 100;
 	
+	private IClick iclick;
 	
 
 	
@@ -87,6 +90,8 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
       	ReadFile();
         init();        
         initGuanggao();
+        
+        setIclick(this);//实现接口了。
         
         
         mShakeListener = new ShakeListener(this);
@@ -222,9 +227,9 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
         	grade.setText("当前积分:vip会员，永久免费使用");
         }
         
-        pre.setOnClickListener(click);
-        next.setOnClickListener(click);
-        setting.setOnClickListener(click);
+        pre.setOnClickListener(this);
+        next.setOnClickListener(this);
+        setting.setOnClickListener(this);
         
         
 		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -256,57 +261,9 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
     }
     
     
-    OnClickListener click = new View.OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			switch(v.getId()){
-			case R.id.pre:
-				
-				if(c.isFirst()){
-					Toast.makeText(MainActivity.this, "已经是第一条记录了", Toast.LENGTH_SHORT).show();
-					break;
-				}
-					
-				c.moveToPrevious();
-				content.setText(c.getString(0));
-//				page.setText(c.getPosition()+1+"/"+c.getCount());
-				break;
-			case R.id.next:
-				if(c.isLast()){
-					Toast.makeText(MainActivity.this, "已经是最后一条记录了", Toast.LENGTH_SHORT).show();
-					break;
-				}
-					
-				c.moveToNext();
-				content.setText(c.getString(0));
-//				page.setText(c.getPosition()+1+"/"+c.getCount());
-				break;
-			case R.id.setting:
-
-	        	
-	        	
-	        	if(state.getCategory() == 0)
-	        		radio1.setChecked(true);
-	        	else
-	        		radio2.setChecked(true);
-	        	
-	        	spinner.setSelection(state.getRank());
-	        	
-	        	if(state.getVoice() == 1)
-	        		voice.setChecked(true);
-	        	else
-	        		voice.setChecked(false);
-	        	
-	        	
-				showAlertDialog(layout, null, "设置", "确定", "取消", onclick);
-			default:
-				;
-			}
-			
-		}
-	};
+//    OnClickListener click = new View.OnClickListener() {
+//
+//	};
 	
 	DialogInterface.OnClickListener onclick = new DialogInterface.OnClickListener() {
 		
@@ -406,24 +363,12 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
   
   public String getRandom(){
 	  Cursor cursor = null;
-	  c = getCursor();
-	  
-	  int num;
-	  
+	  c = getCursor();	  
+	  int num;	  
 	  Random rand = new Random(); //promise the random num got is defferent.
-	  num = rand.nextInt(c.getCount());
-	  
-	  c.moveToPosition(num);
-	  
-	  return c.getString(0);
-	  
-	  
-//	  while(num == lastRandomNum){
-//		  num = rand.nextInt(c.getCount());
-//	  }
-//	  lastRandomNum = num;
-//	  
-	  
+	  num = rand.nextInt(c.getCount());	  
+	  c.moveToPosition(num);	  
+	  return c.getString(0);	  
 	  
   }
    @Override
@@ -441,9 +386,7 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
 			alertDialog.setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-
 							finish();
-
 						}
 					});
 			alertDialog.setNegativeButton("取消",
@@ -493,5 +436,77 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnClic
 
 		
 	}
+	@Override	
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch(v.getId()){
+		case R.id.pre:
+			
+			if(c.isFirst()){
+				Toast.makeText(MainActivity.this, "已经是第一条记录了", Toast.LENGTH_SHORT).show();
+				break;
+			}
+				
+			c.moveToPrevious();
+			content.setText(c.getString(0));
+//			page.setText(c.getPosition()+1+"/"+c.getCount());
+			break;
+		case R.id.next:
+			if(c.isLast()){
+				Toast.makeText(MainActivity.this, "已经是最后一条记录了", Toast.LENGTH_SHORT).show();
+				break;
+			}
+				
+			c.moveToNext();
+			content.setText(c.getString(0));
+//			page.setText(c.getPosition()+1+"/"+c.getCount());
+			break;
+		case R.id.setting:
 
+        	
+        	
+        	if(state.getCategory() == 0)
+        		radio1.setChecked(true);
+        	else
+        		radio2.setChecked(true);
+        	
+        	spinner.setSelection(state.getRank());
+        	
+        	if(state.getVoice() == 1)
+        		voice.setChecked(true);
+        	else
+        		voice.setChecked(false);
+        	
+        	
+        	iclick.clickResponse();
+        	showDialog(SysConfig.Constants.SETTING);
+//			showAlertDialog(layout, null, "设置", "确定", "取消", onclick);
+		default:
+			;
+		}
+		
+	}
+
+	@Override
+	public void clickResponse() {
+		// TODO Auto-generated method stub
+		Toast.makeText(MainActivity.this, "this is a interface test", Toast.LENGTH_SHORT).show();
+
+	}
+
+
+	/**
+	 * @return the iclick
+	 */
+	public IClick getIclick() {
+		return iclick;
+	}
+
+
+	/**
+	 * @param iclick the iclick to set
+	 */
+	public void setIclick(IClick iclick) {
+		this.iclick = iclick;
+	}
 }
